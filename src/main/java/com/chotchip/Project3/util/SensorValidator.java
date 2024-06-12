@@ -28,11 +28,11 @@ public class SensorValidator implements Validator {
     @Override
     public void validate(Object target, Errors errors) {
         SensorDTO sensorDTO = (SensorDTO) target;
-        Sensor byName = sensorsService.findByName(sensorDTO.getName());
-        if (byName == null)
-            throw new SensorNotCreatedException("name is not null");
 
-        if (byName.getName().equals(sensorDTO.getName())) errors.rejectValue("name", "", "name already exists");
+        if (sensorDTO.getName() == null)
+            throw new SensorNotCreatedException("name is not null");
+//        Sensor byName = sensorsService.findByName(sensorDTO.getName());
+//        if (byName.getName().equals(sensorDTO.getName())) errors.rejectValue("name", "", "name already exists");
 
     }
 }
