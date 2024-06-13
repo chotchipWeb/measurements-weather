@@ -9,6 +9,7 @@ import com.chotchip.Project3.models.Measurement;
 import com.chotchip.Project3.services.MeasurementsService;
 import com.chotchip.Project3.services.SensorsService;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,6 +28,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/measurements")
+@Slf4j
 public class MeasurementsController {
     private final MeasurementsService measurementsService;
     private final ModelMapper modelMapper;
@@ -51,6 +53,7 @@ public class MeasurementsController {
                         .append(error.getDefaultMessage())
                         .append(";");
             }
+            log.error(stringBuilder.toString());
             throw new MeasurementNotCreatedException(stringBuilder.toString());
         }
         Measurement measurement = convertToMeasurement(measurementDTO);
@@ -62,6 +65,7 @@ public class MeasurementsController {
 
     @GetMapping()
     public List<MeasurementDTO> showAll() {
+        log.info("Take from db");
         return measurementsService.findAll().stream().map(this::convertToMeasurementDTO).toList();
     }
 

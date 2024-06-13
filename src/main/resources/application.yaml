@@ -15,3 +15,9 @@ spring:
     hiddenmethod:
       filter:
         enabled: true
+logging:
+  file:
+    name: logging
+    path: /
+  level:
+    root: info
