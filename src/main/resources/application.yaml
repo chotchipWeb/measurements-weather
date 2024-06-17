@@ -11,6 +11,7 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         show_sql: true
+    open-in-view: false
   mvc:
     hiddenmethod:
       filter:
