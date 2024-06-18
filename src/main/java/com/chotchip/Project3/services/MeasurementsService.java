@@ -1,7 +1,9 @@
 package com.chotchip.Project3.services;
 
+import com.chotchip.Project3.exception.measurement.MeasurementNotFoundException;
 import com.chotchip.Project3.models.Measurement;
 import com.chotchip.Project3.repositories.MeasurementsRepository;
+import jakarta.el.MethodNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +35,10 @@ public class MeasurementsService {
     @Transactional(readOnly = true)
     public List<Measurement> findAllRainingDays() {
         return measurementsRepository.findByRainingTrue();
+    }
+    @Transactional(readOnly = true)
+    public Measurement findById(int id) {
+        return measurementsRepository.findById(id).orElseThrow(MeasurementNotFoundException::new);
     }
 
 }

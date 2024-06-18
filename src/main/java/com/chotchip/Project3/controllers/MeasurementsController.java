@@ -4,6 +4,7 @@ import com.chotchip.Project3.dto.MeasurementDTO;
 import com.chotchip.Project3.dto.SensorDTO;
 import com.chotchip.Project3.exception.SensorNotFoundException;
 import com.chotchip.Project3.exception.measurement.MeasurementNotCreatedException;
+import com.chotchip.Project3.exception.measurement.MeasurementNotFoundException;
 import com.chotchip.Project3.exception.response.MeasurementErrorResponse;
 import com.chotchip.Project3.models.Measurement;
 import com.chotchip.Project3.services.MeasurementsService;
@@ -18,6 +19,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -62,6 +64,12 @@ public class MeasurementsController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @GetMapping("{id}")
+    public MeasurementDTO showById(@PathVariable("id") int id) {
+
+        return convertToMeasurementDTO(measurementsService.findById(id));
+    }
+
 
     @GetMapping()
     public List<MeasurementDTO> showAll() {
@@ -83,6 +91,12 @@ public class MeasurementsController {
     private ResponseEntity<MeasurementErrorResponse> handlerException(SensorNotFoundException e) {
         return new ResponseEntity<>(new MeasurementErrorResponse("Sensor not found!", LocalDateTime.now()), HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler
+    private ResponseEntity<MeasurementErrorResponse> handlerException(MeasurementNotFoundException e) {
+        return new ResponseEntity<>(new MeasurementErrorResponse(e.getMessage(), LocalDateTime.now()), HttpStatus.BAD_REQUEST);
+    }
+
 
     private Measurement convertToMeasurement(MeasurementDTO measurementDTO) {
         return modelMapper.map(measurementDTO, Measurement.class);
