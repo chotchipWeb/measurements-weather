@@ -4,11 +4,9 @@ import com.chotchip.Project3.dto.SensorDTO;
 import com.chotchip.Project3.exception.SensorNotCreatedException;
 import com.chotchip.Project3.exception.SensorNotFoundException;
 import com.chotchip.Project3.exception.response.SensorErrorResponse;
-import com.chotchip.Project3.models.Sensor;
 import com.chotchip.Project3.services.SensorsService;
 import com.chotchip.Project3.util.SensorValidator;
 import jakarta.validation.Valid;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,13 +28,11 @@ import java.util.List;
 public class SensorsController {
     private final SensorsService sensorsService;
     private final SensorValidator sensorValidator;
-    private final ModelMapper modelMapper;
 
     @Autowired
-    public SensorsController(SensorsService sensorsService, SensorValidator sensorValidator, ModelMapper modelMapper) {
+    public SensorsController(SensorsService sensorsService, SensorValidator sensorValidator) {
         this.sensorsService = sensorsService;
         this.sensorValidator = sensorValidator;
-        this.modelMapper = modelMapper;
     }
 
     @PostMapping("/registration")
@@ -55,16 +51,14 @@ public class SensorsController {
             throw new SensorNotCreatedException(stringBuilder.toString());
         }
 
-        sensorsService.save(convertToSensor(sensorDTO));
+        sensorsService.save(sensorDTO);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
     public SensorDTO findById(@PathVariable("id") int id) {
-
-        return convertToSensorDTO(sensorsService.findById(id));
+        return sensorsService.findById(id);
     }
-
 
 
     @ExceptionHandler
@@ -79,11 +73,4 @@ public class SensorsController {
         return new ResponseEntity<>(new SensorErrorResponse(str, LocalDateTime.now()), HttpStatus.BAD_REQUEST);
     }
 
-    private Sensor convertToSensor(SensorDTO sensorDTO) {
-        return modelMapper.map(sensorDTO, Sensor.class);
-    }
-
-    private SensorDTO convertToSensorDTO(Sensor sensor) {
-        return modelMapper.map(sensor, SensorDTO.class);
-    }
 }

@@ -1,17 +1,13 @@
 package com.chotchip.Project3.controllers;
 
 import com.chotchip.Project3.dto.MeasurementDTO;
-import com.chotchip.Project3.dto.SensorDTO;
 import com.chotchip.Project3.exception.SensorNotFoundException;
 import com.chotchip.Project3.exception.measurement.MeasurementNotCreatedException;
 import com.chotchip.Project3.exception.measurement.MeasurementNotFoundException;
 import com.chotchip.Project3.exception.response.MeasurementErrorResponse;
-import com.chotchip.Project3.models.Measurement;
 import com.chotchip.Project3.services.MeasurementsService;
-import com.chotchip.Project3.services.SensorsService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,14 +29,10 @@ import java.util.List;
 @Slf4j
 public class MeasurementsController {
     private final MeasurementsService measurementsService;
-    private final ModelMapper modelMapper;
-    private final SensorsService sensorsService;
 
     @Autowired
-    public MeasurementsController(MeasurementsService measurementsService, ModelMapper modelMapper, SensorsService sensorsService) {
+    public MeasurementsController(MeasurementsService measurementsService) {
         this.measurementsService = measurementsService;
-        this.modelMapper = modelMapper;
-        this.sensorsService = sensorsService;
     }
 
     @PostMapping("/add")
@@ -58,28 +50,25 @@ public class MeasurementsController {
             log.error(stringBuilder.toString());
             throw new MeasurementNotCreatedException(stringBuilder.toString());
         }
-        Measurement measurement = convertToMeasurement(measurementDTO);
-        measurement.setSensor(sensorsService.findByName(measurementDTO.getSensor().getName()));
-        measurementsService.save(measurement);
+        measurementsService.save(measurementDTO);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("{id}")
     public MeasurementDTO showById(@PathVariable("id") int id) {
-
-        return convertToMeasurementDTO(measurementsService.findById(id));
+        return measurementsService.findById(id);
     }
 
 
     @GetMapping()
     public List<MeasurementDTO> showAll() {
         log.info("Take from db");
-        return measurementsService.findAll().stream().map(this::convertToMeasurementDTO).toList();
+        return measurementsService.findAll();
     }
 
     @GetMapping("/rainyDaysCount")
     public List<MeasurementDTO> showAllRainDays() {
-        return measurementsService.findAllRainingDays().stream().map(this::convertToMeasurementDTO).toList();
+        return measurementsService.findAllRainingDays();
     }
 
     @ExceptionHandler
@@ -98,11 +87,4 @@ public class MeasurementsController {
     }
 
 
-    private Measurement convertToMeasurement(MeasurementDTO measurementDTO) {
-        return modelMapper.map(measurementDTO, Measurement.class);
-    }
-
-    private MeasurementDTO convertToMeasurementDTO(Measurement measurement) {
-        return modelMapper.map(measurement, MeasurementDTO.class);
-    }
 }
